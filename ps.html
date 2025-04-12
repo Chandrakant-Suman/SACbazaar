@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Secure Payment - SACbazaar</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: url('banking-bg.jpg') no-repeat center center/cover;
+      color: #333;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #222;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: bold;
+    }
+
+    /* Main Container */
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      max-width: 450px;
+      margin: 60px auto;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      flex: 1 0 auto;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      background: #eee;
+      border-radius: 8px 8px 0 0;
+      font-weight: bold;
+    }
+
+    .tab.active {
+      background: #4CAF50;
+      color: #fff;
+    }
+
+    .form {
+      display: none;
+    }
+
+    .form.active {
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+
+    .total-box {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .back-btn {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f44336;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* Footer with gradient + animation */
+    .footer {
+      flex-shrink: 0;
+      text-align: center;
+      padding: 15px;
+      background: linear-gradient(270deg, #000000, #020202, #000000);
+      background-size: 600% 600%;
+      color: white;
+      /* animation: gradientMove 8s ease infinite; */
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <h2><a href="home.html" style="text-decoration: none; color: white;">SACbazaar</a></h2>
+    <div>
+      <a href="home.html">Home</a>
+      <a href="cart.html">Cart</a>
+      <a href="profile.html">Profile</a>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- <a href="cart.html" class="back-btn">← Back to Home</a> -->
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('card')">Card</div>
+      <div class="tab" onclick="showTab('upi')">UPI</div>
+    </div>
+
+    <div class="total-box" id="totalBox">
+      Total Amount: ₹0
+    </div>
+
+    <!-- Card Payment -->
+    <div class="form active" id="card">
+      <input type="text" id="cardNumber" placeholder="Card Number (16 digits)">
+      <input type="text" id="expiry" placeholder="MM/YY">
+      <input type="text" id="cvv" placeholder="CVV">
+      <input type="text" id="cardName" placeholder="Cardholder Name">
+      <button id="payCardBtn" onclick="processCard()">Pay</button>
+      <div class="loading" id="cardLoading" style="display:none;"><div class="spinner"></div></div>
+      <div class="message" id="cardMsg"></div>
+    </div>
+
+    <!-- UPI Payment -->
+    <div class="form" id="upi">
+      <input type="text" id="upiId" placeholder="UPI ID (e.g. name@bank)">
+      <button id="payUpiBtn" onclick="processUPI()">Pay</button>
+      <div class="loading" id="upiLoading" style="display:none;"><div class="spinner"></div></div>
+      <div class="message" id="upiMsg"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    &copy; 2025 SACbazaar. All rights reserved.
+  </div>
+
+  <!-- Script -->
+  <script>
+    let totalAmount = localStorage.getItem("totalAmount") || 0;
+    document.getElementById("totalBox").innerText = `Total Amount: ₹${totalAmount}`;
+    document.getElementById("payCardBtn").innerText = `Pay ₹${totalAmount}`;
+    document.getElementById("payUpiBtn").innerText = `Pay ₹${totalAmount}`;
+
+    function showTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
+      document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+    }
+
+    function processCard() {
+      const number = document.getElementById('cardNumber').value;
+      const expiry = document.getElementById('expiry').value;
+      const cvv = document.getElementById('cvv').value;
+      const name = document.getElementById('cardName').value;
+      const msg = document.getElementById('cardMsg');
+      const loading = document.getElementById('cardLoading');
+      msg.innerText = "";
+
+      if (!number || number.length !== 16 || isNaN(number)) {
+        msg.style.color = "red"; msg.innerText = "Enter valid 16-digit card number."; return;
+      }
+      if (!expiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
+        msg.style.color = "red"; msg.innerText = "Enter expiry in MM/YY format."; return;
+      }
+      if (!cvv || cvv.length !== 3 || isNaN(cvv)) {
+        msg.style.color = "red"; msg.innerText = "Enter valid 3-digit CVV."; return;
+      }
+      if (!name) {
+        msg.style.color = "red"; msg.innerText = "Enter cardholder name."; return;
+      }
+
+      loading.style.display = "flex";
+      setTimeout(() => {
+        loading.style.display = "none";
+        msg.style.color = "green";
+        msg.innerText = `Payment simulated for ₹${totalAmount}`;
+      }, 3000);
+    }
+
+    function processUPI() {
+      const upiId = document.getElementById('upiId').value;
+      const msg = document.getElementById('upiMsg');
+      const loading = document.getElementById('upiLoading');
+      msg.innerText = "";
+
+      if (!upiId || !upiId.includes('@')) {
+        msg.style.color = "red"; msg.innerText = "Enter a valid UPI ID."; return;
+      }
+
+      loading.style.display = "flex";
+      setTimeout(() => {
+        loading.style.display = "none";
+        msg.style.color = "green";
+        msg.innerText = `Payment simulated for ₹${totalAmount}`;
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

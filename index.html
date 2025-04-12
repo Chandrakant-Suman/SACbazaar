@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SACbazaar Registration</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <div class="registration-form">
+        <h2>Welcome to SACbazaar</h2>
+        <p>Fill the details to get started</p>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your Username">
+                <span class="error" id="username-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your Email">
+                <span class="error" id="email-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <span class="error" id="password-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Enter confirm password">
+                <span class="error" id="confirmPassword-error"></span>
+            </div>
+            <button type="submit" class="get-started-btn">Get Started</button>
+        </form>
+    </div>
+
+    <script src="main.js"></script>
+
+</body>
+</html>

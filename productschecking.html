@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clothing Store</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="base.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+  
+    h1 {
+      text-align: center;
+      margin: 20px 0 10px;
+    }
+  
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+  
+    .top-bar span {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  
+    .top-bar a, .top-bar button {
+      background-color: black;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+  
+    .top-bar a:hover, .top-bar button:hover {
+      background-color: rgb(239, 213, 16);
+      color: black;
+      font-weight: bold;
+    }
+  
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+  
+    .nav-buttons a {
+      background-color: black;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+    }
+  
+    .nav-buttons a:hover {
+      background-color: rgb(239, 213, 16);
+      color: black;
+      font-weight: bold;
+    }
+  
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      padding: 0 20px 20px;
+    }
+  
+    .product-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      text-align: center;
+    }
+  
+    .product-card img {
+      max-width: 100%;
+      border-radius: 6px;
+      height: 380px;
+      object-fit: auto;
+    }
+  
+    .product-details {
+      margin: 10px 0;
+    }
+  
+    .product-details p {
+      margin: 4px 0;
+    }
+  
+    .btn {
+      background-color: black;
+      border: none;
+      color: white;
+      font-size: large;
+      font-weight:bold;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+  
+    .btn:hover {
+      background-color: rgb(239, 213, 16);
+      color: black;
+      font-weight: bold;
+    }
+  
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+  
+    .quantity-controls span {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 12px 20px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease, top 0.5s ease;
+    font-weight: bold;
+}
+
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+    top: 40px;
+}
+
+  </style>
+  
+</head>
+<body>
+
+  <!-- Navbar Start -->
+  <nav>
+    <div class="nav__header">
+      <div class="nav__logo">
+        <a href="home.html">SACbazaar</a>
+      </div>
+      <div class="nav__menu__btn" id="menu-btn">
+        <i class="ri-menu-line"></i>
+      </div>
+    </div>
+    <ul class="nav__links" id="nav-links">
+      <li><a href="home.html">CATALOGUE</a></li>
+      <li><a href="home.html">FASHION</a></li>
+      <li><a href="home.html">FAVOURITE</a></li>
+      <li>
+        <a href="profile.html"><button class="btn">Profile</button></a>
+      </li>
+    </ul>
+  </nav>
+  <!-- Navbar End -->
+
+  <h1>Explore Our Clothes</h1>
+
+  <div class="top-bar">
+    <span>Total Price: ₹<span id="total-price">0</span></span>
+    <div>
+      <a href="cart.html">Go to Cart</a>
+      <button onclick="clearCart()">Clear Cart</button>
+    </div>
+  </div>
+
+  <div class="nav-buttons">
+    <a href="home.html">Back to Home</a>
+  </div>
+
+  <div class="product-grid" id="product-grid"></div>
+
+  <!-- Footer Start -->
+  <footer>
+    <div class="section__container footer__container">
+      <div class="footer__col">
+        <div class="footer__logo">
+          <a href="home.html">SACbazaar</a>
+        </div>
+        <p>Complete your style with awesome clothes from us.</p>
+        <ul class="footer__socials">
+          <li><a href="#"><i class="ri-facebook-fill"></i></a></li>
+          <li><a href="#"><i class="ri-instagram-line"></i></a></li>
+          <li><a href="#"><i class="ri-twitter-fill"></i></a></li>
+          <li><a href="#"><i class="ri-linkedin-fill"></i></a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Company</h4>
+        <ul class="footer__links">
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="support.html">Support</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Quick Links</h4>
+        <ul class="footer__links">
+          <li><a href="contact.html">Store Location</a></li>
+          <li><a href="profile.html">Order Tracking</a></li>
+          <li><a href="size.html">Size Guide</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul class="footer__links">
+          <li><a href="terms.html">Terms & Conditions</a></li>
+          <li><a href="pp.html">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="toast" class="toast">Product added to cart!</div>
+
+    <div class="footer__bar">
+      Copyright © 2025 SACbaazar. All rights reserved.
+    </div>
+  </footer>
+  <!-- Footer End -->
+
+  <script>
+    const products = [
+      { id: 1, name: "Classic White Shirt", type: "Women", size: "S/M/L/XL/XXL/XXXL", price: 799, image: "productImage/id1.jpg" },
+      { id: 2, name: "Slim Fit Jeans", type: "Women", size: "S/M/L/XL/XXL/XXXL", price: 1299, image: "productImage/id2.jpg" },
+      { id: 3, name: "Knitted Cardigan", type: "Women", size: "S/M/L/XL/XXL/XXXL", price: 1499, image: "productImage/id3.jpg" },
+      { id: 4, name: "Puffer Jacket", type: "Unisex", size: "S/M/L/XL/XXL/XXXL", price: 2499, image: "productImage/id4.jpg" },
+      { id: 5, name: "Graphic Tee", type: "Unisex", size: "S/M/L/XL/XXL/XXXL", price: 499, image: "productImage/id5.jpg" },
+      { id: 6, name: "Cargo Pants", type: "Men", size: "S/M/L/XL/XXL/XXXL", price: 1599, image: "productImage/id6.png" },
+      { id: 7, name: "Wool Blend Sweater", type: "Unisex", size: "S/M/L/XL/XXL/XXXL", price: 999, image: "productImage/id7.jpg" },
+      { id: 8, name: "Oversized Hoodie", type: "Unisex", size: "S/M/L/XL/XXL/XXXL", price: 1899, image: "productImage/id8.jpg" },
+      { id: 9, name: "Polo T-Shirt", type: "Men", size: "S/M/L/XL/XXL/XXXL", price: 699, image: "productImage/id9.jpg" },
+      { id: 10, name: "Ripped Jeans", type: "Unisex", size: "S/M/L/XL/XXL/XXXL", price: 1399, image: "productImage/id10.jpg" },
+      { id: 11, name: "Crop Top", type: "Women", size: "S/M/L/XL/XXL/XXXL", price: 599, image: "productImage/id11.jpg" },
+      { id: 12, name: "Denim Jacket", type: "Unisex", size: "S/M/L/XL/XXL/XXXL", price: 2199, image: "productImage/id12.jpg" },
+      { id: 13, name: "Solid Casual Shirt", type: "Women", size: "S/M/L/XL/XXL/XXXL", price: 899, image: "productImage/id13.jpg" },
+      { id: 14, name: "Formal Trousers", type: "Women", size: "S/M/L/XL/XXL/XXXL", price: 1199, image: "productImage/id14.jpg" },
+      { id: 15, name: "Ribbed Sweater", type: "Women", size: "S/M/L/XL/XXL/XXXL", price: 899, image: "productImage/id15.jpg" },
+      { id: 16, name: "Fleece Jacket", type: "Unisex", size: "S/M/L/XL/XXL/XXXL", price: 1699, image: "productImage/id16.jpg" }
+    ];
+  
+    const grid = document.getElementById("product-grid");
+    const totalPriceElement = document.getElementById("total-price");
+    const quantityMap = {};
+  
+    function changeQuantity(productId, delta) {
+      const qtySpan = document.getElementById(`qty-${productId}`);
+      let currentQty = quantityMap[productId] || 0;
+      currentQty += delta;
+      if (currentQty < 0) currentQty = 0;
+      quantityMap[productId] = currentQty;
+      qtySpan.textContent = currentQty;
+    }
+  
+    function addToCart(productId) {
+      const selectedQty = quantityMap[productId] || 0;
+      if (selectedQty <= 0) {
+        alert("Add quantity.");
+        return;
+      }
+  
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const product = products.find(p => p.id === productId);
+      const existing = cart.find(p => p.id === productId);
+      if (existing) {
+        existing.quantity += selectedQty;
+      } else {
+        cart.push({ ...product, quantity: selectedQty });
+      }
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateTotalPrice();
+      alert(`${product.name} added to cart!`);
+    }
+  
+    function updateTotalPrice() {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+      const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+      totalPriceElement.textContent = total;
+    }
+  
+    function clearCart() {
+      localStorage.removeItem("cart");
+      alert("Cart has been cleared!");
+      updateTotalPrice();
+    }
+  
+    products.forEach(product => {
+      quantityMap[product.id] = 0; // Set default quantity to 0
+      const card = document.createElement("div");
+      card.className = "product-card";
+  
+      card.innerHTML = `
+        <img src="${product.image}" alt="${product.name}" />
+        <div class="product-details">
+          <h3>${product.name}</h3>
+          <p>Type: ${product.type}</p>
+          <p>Size: ${product.size}</p>
+          <p>Price: ₹${product.price}</p>
+          <div class="quantity-controls">
+            <button class="btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+            <span id="qty-${product.id}">0</span>
+            <button class="btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+          </div>
+          <button class="btn" onclick="addToCart(${product.id})">Add to Cart</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  
+    updateTotalPrice();
+  </script>
+  
+
+  <script src="https://unpkg.com/scrollreveal"></script>
+</body>
+</html>

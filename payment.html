@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Custom Payment Gateway</title>
+  <style>
+    :root {
+      --primary-color: #4e889a;
+      --white: #fff;
+      --text-dark: #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-weight: bold;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-top: 80px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: var(--primary-color);
+      z-index: 1000;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav__container {
+      max-width: 1200px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav__logo a {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .nav__menu__btn {
+      display: none;
+      font-size: 1.8rem;
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .nav__links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav__links li a {
+      color: var(--white);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .nav__links li a:hover {
+      color: var(--text-dark);
+    }
+
+    .btn {
+      background-color: #fffdfd;
+      color: var(--primary-color);
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .btn:hover {
+      background-color: #060606;
+    }
+
+    /* Responsive Navbar */
+    @media (max-width: 768px) {
+      .nav__menu__btn {
+        display: block;
+      }
+
+      .nav__links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--primary-color);
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        display: none;
+      }
+
+      .nav__links.open {
+        display: flex;
+      }
+    }
+
+    /* Container */
+    .container {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 400px;
+      margin: auto;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      background: #eee;
+      border-radius: 8px 8px 0 0;
+      font-weight: bold;
+    }
+    .tab.active {
+      background: #4CAF50;
+      color: #fff;
+    }
+    .form {
+      display: none;
+    }
+    .form.active {
+      display: block;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .loading {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    .total-box {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .clear-cart-btn {
+      background-color: #f44336;
+      margin-bottom: 10px;
+    }
+    .clear-cart-btn:hover {
+      background-color: #d32f2f;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      background-color: #4e889a;
+      color: #fff;
+      text-align: center;
+      padding: 15px 0;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav__container">
+      <div class="nav__logo">
+        <a href="home.html">SACbazaar</a>
+      </div>
+      <div class="nav__menu__btn" id="menu-btn">&#9776;</div>
+      <ul class="nav__links" id="nav-links">
+        <li><a href="home.html">CATALOGUE</a></li>
+        <li><a href="home.html">FASHION</a></li>
+        <li><a href="home.html">FAVOURITE</a></li>
+        <li><a href="cart.html">CART</a></li>
+        <li><a href="profile.html"><button class="btn">Profile</button></a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Payment Box -->
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('card')">Card</div>
+      <div class="tab" onclick="showTab('upi')">UPI</div>
+    </div>
+
+    <div class="total-box" id="totalBox">
+      Total Amount: ₹0
+    </div>
+
+    <button class="clear-cart-btn" onclick="clearCart()">Clear Cart</button>
+
+    <!-- Card Payment -->
+    <div class="form active" id="card">
+      <input type="text" id="cardNumber" placeholder="Card Number (16 digits)">
+      <input type="text" id="expiry" placeholder="MM/YY">
+      <input type="text" id="cvv" placeholder="CVV">
+      <input type="text" id="cardName" placeholder="Cardholder Name">
+      <button id="payCardBtn" onclick="processCard()">Pay</button>
+      <div class="loading" id="cardLoading" style="display:none;"><div class="spinner"></div></div>
+      <div class="message" id="cardMsg"></div>
+    </div>
+
+    <!-- UPI Payment -->
+    <div class="form" id="upi">
+      <input type="text" id="upiId" placeholder="UPI ID (e.g. name@bank)">
+      <button id="payUpiBtn" onclick="processUPI()">Pay</button>
+      <div class="loading" id="upiLoading" style="display:none;"><div class="spinner"></div></div>
+      <div class="message" id="upiMsg"></div>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <footer>
+    &copy; 2025 SACbazaar. All rights reserved.
+  </footer>
+
+  <script>
+    // Step 1: Get amount from URL or localStorage
+    const params = new URLSearchParams(window.location.search);
+    let totalAmount = parseFloat(params.get("amount")) 
+                      || parseFloat(localStorage.getItem("totalAmount")) 
+                      || 0;
+  
+    // Step 2: Update display
+    function updateDisplay(amount) {
+      document.getElementById("totalBox").innerText = `Total Amount: ₹${amount}`;
+      document.getElementById("payCardBtn").innerText = `Pay ₹${amount} by Card`;
+      document.getElementById("payUpiBtn").innerText = `Pay ₹${amount} by UPI`;
+      document.getElementById("payment-msg").innerText = `Payment simulated for ₹${amount}`;
+      
+      const disable = amount === 0;
+      document.getElementById("payCardBtn").disabled = disable;
+      document.getElementById("payUpiBtn").disabled = disable;
+    }
+  
+    updateDisplay(totalAmount);
+  
+    // Tabs
+    function showTab(tabName) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
+      document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+    }
+  
+    // Card Payment Simulation
+    function processCard() {
+      if (totalAmount === 0) return alert("No amount to pay!");
+  
+      const number = document.getElementById('cardNumber').value;
+      const expiry = document.getElementById('expiry').value;
+      const cvv = document.getElementById('cvv').value;
+      const name = document.getElementById('cardName').value;
+      const msg = document.getElementById('cardMsg');
+      const loading = document.getElementById('cardLoading');
+      msg.innerText = "";
+  
+      if (!number || number.length !== 16 || isNaN(number)) {
+        msg.style.color = "red"; msg.innerText = "Enter valid 16-digit card number."; return;
+      }
+      if (!expiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
+        msg.style.color = "red"; msg.innerText = "Enter expiry in MM/YY format."; return;
+      }
+      if (!cvv || cvv.length !== 3 || isNaN(cvv)) {
+        msg.style.color = "red"; msg.innerText = "Enter valid 3-digit CVV."; return;
+      }
+      if (!name) {
+        msg.style.color = "red"; msg.innerText = "Enter cardholder name."; return;
+      }
+  
+      loading.style.display = "flex";
+      setTimeout(() => {
+        loading.style.display = "none";
+        msg.style.color = "green";
+        msg.innerText = `Payment simulated for ₹${totalAmount}`;
+      }, 3000);
+    }
+  
+    // UPI Payment Simulation
+    function processUPI() {
+      if (totalAmount === 0) return alert("No amount to pay!");
+  
+      const upiId = document.getElementById('upiId').value;
+      const msg = document.getElementById('upiMsg');
+      const loading = document.getElementById('upiLoading');
+      msg.innerText = "";
+  
+      if (!upiId || !upiId.includes('@')) {
+        msg.style.color = "red"; msg.innerText = "Enter a valid UPI ID."; return;
+      }
+  
+      loading.style.display = "flex";
+      setTimeout(() => {
+        loading.style.display = "none";
+        msg.style.color = "green";
+        msg.innerText = `Payment simulated for ₹${totalAmount}`;
+      }, 3000);
+    }
+  
+    // Clear Cart
+    // function clearCart() {
+    //   localStorage.removeItem("totalAmount");
+    //   totalAmount = 0;
+    //   updateDisplay(totalAmount);
+    //   document.getElementById("cardMsg").innerText = "";
+    //   document.getElementById("upiMsg").innerText = "";
+    //   alert("Cart has been cleared!");
+    // }
+  
+    // Navbar toggle
+    document.getElementById("menu-btn").addEventListener("click", () => {
+      document.getElementById("nav-links").classList.toggle("open");
+    });
+  
+    // Auto update if totalAmount changes from other tabs
+    window.addEventListener("storage", () => {
+      const newAmount = parseFloat(localStorage.getItem("totalAmount")) || 0;
+      totalAmount = newAmount;
+      updateDisplay(totalAmount);
+    });
+  </script>
+  
+</body>
+</html>
