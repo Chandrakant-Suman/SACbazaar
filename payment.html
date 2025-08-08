@@ -121,38 +121,17 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       width: 400px;
       margin: auto;
+      text-align: center;
     }
 
-    .tabs {
-      display: flex;
-      margin-bottom: 20px;
-    }
-    .tab {
-      flex: 1;
+    .total-box {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
       padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      background: #eee;
-      border-radius: 8px 8px 0 0;
+      margin-bottom: 15px;
       font-weight: bold;
     }
-    .tab.active {
-      background: #4CAF50;
-      color: #fff;
-    }
-    .form {
-      display: none;
-    }
-    .form.active {
-      display: block;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
+
     button {
       width: 100%;
       background-color: #4CAF50;
@@ -166,39 +145,6 @@
     button:hover {
       background-color: #45a049;
     }
-    .message {
-      text-align: center;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    .loading {
-      display: flex;
-      justify-content: center;
-      margin-top: 15px;
-    }
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #4CAF50;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-    }
-    .total-box {
-      background-color: #f9f9f9;
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 15px;
-      text-align: center;
-      font-weight: bold;
-    }
-    .clear-cart-btn {
-      background-color: #f44336;
-      margin-bottom: 10px;
-    }
-    .clear-cart-btn:hover {
-      background-color: #d32f2f;
-    }
 
     /* Footer */
     footer {
@@ -207,11 +153,6 @@
       color: #fff;
       text-align: center;
       padding: 15px 0;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg);}
-      100% { transform: rotate(360deg);}
     }
   </style>
 </head>
@@ -236,35 +177,15 @@
 
   <!-- Payment Box -->
   <div class="container">
-    <div class="tabs">
-      <div class="tab active" onclick="showTab('card')">Card</div>
-      <div class="tab" onclick="showTab('upi')">UPI</div>
-    </div>
-
     <div class="total-box" id="totalBox">
-      Total Amount: ₹0
+      <div id="itemCost">Item Cost: ₹0</div>
+      <div id="deliveryCharges">Delivery Charges: ₹0</div>
+      <div id="handlingCharges">Handling Charges: ₹9</div>
+      <hr>
+      <div id="finalTotal"><strong>Total Amount: ₹0</strong></div>
     </div>
 
-    <!-- <button class="clear-cart-btn" onclick="clearCart()">Clear Cart</button> -->
-
-    <!-- Card Payment -->
-    <div class="form active" id="card">
-      <input type="text" id="cardNumber" placeholder="Card Number (16 digits)">
-      <input type="text" id="expiry" placeholder="MM/YY">
-      <input type="text" id="cvv" placeholder="CVV">
-      <input type="text" id="cardName" placeholder="Cardholder Name">
-      <button id="payCardBtn" onclick="processCard()">Pay</button>
-      <div class="loading" id="cardLoading" style="display:none;"><div class="spinner"></div></div>
-      <div class="message" id="cardMsg"></div>
-    </div>
-
-    <!-- UPI Payment -->
-    <div class="form" id="upi">
-      <input type="text" id="upiId" placeholder="UPI ID (e.g. name@bank)">
-      <button id="payUpiBtn" onclick="processUPI()">Pay</button>
-      <div class="loading" id="upiLoading" style="display:none;"><div class="spinner"></div></div>
-      <div class="message" id="upiMsg"></div>
-    </div>
+    <button id="payNowBtn">Pay Now</button>
   </div>
   
   <!-- Footer -->
@@ -273,110 +194,54 @@
   </footer>
 
   <script>
-    // Step 1: Get amount from URL or localStorage
+      // Get amount from URL or localStorage
     const params = new URLSearchParams(window.location.search);
     let totalAmount = parseFloat(params.get("amount")) 
                       || parseFloat(localStorage.getItem("totalAmount")) 
                       || 0;
-  
-    // Step 2: Update display
+
+    // Update display with breakdown
     function updateDisplay(amount) {
-      document.getElementById("totalBox").innerText = `Total Amount: ₹${amount}`;
-      document.getElementById("payCardBtn").innerText = `Pay ₹${amount} by Card`;
-      document.getElementById("payUpiBtn").innerText = `Pay ₹${amount} by UPI`;
-      document.getElementById("payment-msg").innerText = `Payment simulated for ₹${amount}`;
-      
-      const disable = amount === 0;
-      document.getElementById("payCardBtn").disabled = disable;
-      document.getElementById("payUpiBtn").disabled = disable;
+      const deliveryCharge = amount > 999 ? 40 : 60;
+      const handlingCharge = 9;
+      const finalAmount = amount + deliveryCharge + handlingCharge;
+
+      document.getElementById("itemCost").innerText = `Item Cost: ₹${amount}`;
+      document.getElementById("deliveryCharges").innerText = `Delivery Charges: ₹${deliveryCharge}`;
+      document.getElementById("handlingCharges").innerText = `Handling Charges: ₹${handlingCharge}`;
+      document.getElementById("finalTotal").innerHTML = `<strong>Total Amount: ₹${finalAmount}</strong>`;
+
+      document.getElementById("payNowBtn").innerText = `Pay ₹${finalAmount} Now`;
+      document.getElementById("payNowBtn").disabled = amount === 0;
     }
-  
     updateDisplay(totalAmount);
-  
-    // Tabs
-    function showTab(tabName) {
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
-      document.querySelector(`.tab[onclick="showTab('${tabName}')"]`).classList.add('active');
-      document.getElementById(tabName).classList.add('active');
-    }
-  
-    // Card Payment Simulation
-    function processCard() {
-      if (totalAmount === 0) return alert("No amount to pay!");
-  
-      const number = document.getElementById('cardNumber').value;
-      const expiry = document.getElementById('expiry').value;
-      const cvv = document.getElementById('cvv').value;
-      const name = document.getElementById('cardName').value;
-      const msg = document.getElementById('cardMsg');
-      const loading = document.getElementById('cardLoading');
-      msg.innerText = "";
-  
-      if (!number || number.length !== 16 || isNaN(number)) {
-        msg.style.color = "red"; msg.innerText = "Enter valid 16-digit card number."; return;
+
+    // Redirect to Razorpay Payment Gateway
+    document.getElementById("payNowBtn").addEventListener("click", () => {
+      if (totalAmount === 0) {
+        alert("No amount to pay!");
+        return;
       }
-      if (!expiry.match(/^(0[1-9]|1[0-2])\/\d{2}$/)) {
-        msg.style.color = "red"; msg.innerText = "Enter expiry in MM/YY format."; return;
-      }
-      if (!cvv || cvv.length !== 3 || isNaN(cvv)) {
-        msg.style.color = "red"; msg.innerText = "Enter valid 3-digit CVV."; return;
-      }
-      if (!name) {
-        msg.style.color = "red"; msg.innerText = "Enter cardholder name."; return;
-      }
-  
-      loading.style.display = "flex";
-      setTimeout(() => {
-        loading.style.display = "none";
-        msg.style.color = "green";
-        msg.innerText = `Payment simulated for ₹${totalAmount}`;
-      }, 3000);
-    }
-  
-    // UPI Payment Simulation
-    function processUPI() {
-      if (totalAmount === 0) return alert("No amount to pay!");
-  
-      const upiId = document.getElementById('upiId').value;
-      const msg = document.getElementById('upiMsg');
-      const loading = document.getElementById('upiLoading');
-      msg.innerText = "";
-  
-      if (!upiId || !upiId.includes('@')) {
-        msg.style.color = "red"; msg.innerText = "Enter a valid UPI ID."; return;
-      }
-  
-      loading.style.display = "flex";
-      setTimeout(() => {
-        loading.style.display = "none";
-        msg.style.color = "green";
-        msg.innerText = `Payment simulated for ₹${totalAmount}`;
-      }, 3000);
-    }
-  
-    // Clear Cart
-    // function clearCart() {
-    //   localStorage.removeItem("totalAmount");
-    //   totalAmount = 0;
-    //   updateDisplay(totalAmount);
-    //   document.getElementById("cardMsg").innerText = "";
-    //   document.getElementById("upiMsg").innerText = "";
-    //   alert("Cart has been cleared!");
-    // }
-  
+      const deliveryCharge = totalAmount > 999 ? 40 : 60;
+      const handlingCharge = 9;
+      const finalAmount = totalAmount + deliveryCharge + handlingCharge;
+
+      const razorpayLink = `https://razorpay.me/@sacbazaar?amount=${finalAmount * 100}`; // amount in paise
+      window.location.href = razorpayLink;
+    });
+
     // Navbar toggle
     document.getElementById("menu-btn").addEventListener("click", () => {
       document.getElementById("nav-links").classList.toggle("open");
     });
-  
-    // Auto update if totalAmount changes from other tabs
+
+    // Update if totalAmount changes from other tabs
     window.addEventListener("storage", () => {
-      const newAmount = parseFloat(localStorage.getItem("totalAmount")) || 0;
-      totalAmount = newAmount;
+      totalAmount = parseFloat(localStorage.getItem("totalAmount")) || 0;
       updateDisplay(totalAmount);
     });
+
   </script>
-  
+
 </body>
 </html>
